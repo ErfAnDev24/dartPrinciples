@@ -1,22 +1,34 @@
-void main(List<String> args) {
-  var numbers = numberGenerator().asBroadcastStream();
+void main() {
+  var streamOne = numberGenerator().asBroadcastStream();
 
-  numbers.listen((event) {
+  streamOne.map((event) => event * 10).listen((event) {
     print(event);
+  }, onDone: () {
+    print('done One');
+  }, onError: (e) {
+    print(e);
   });
 
-  numbers.where((event) => event != 1).listen((event) {
-    print(event);
-  });
-
-  numbers.map((event) => event * 10).listen((event) {
-    print(event);
-  });
+  streamOne
+      .where(
+    (event) => event == 0,
+  )
+      .listen(
+    (event) {
+      print(event);
+    },
+    onDone: () {
+      print('done');
+    },
+  );
 }
 
 Stream<int> numberGenerator() async* {
-  for (int i = 1; i < 5; i++) {
-    await Future.delayed(Duration(seconds: 2));
+  for (int i = 0; i < 5; i++) {
+    await Future.delayed(Duration(seconds: 1));
+    if (i == 4) {
+      throw Exception('my');
+    }
     yield i;
   }
 }
